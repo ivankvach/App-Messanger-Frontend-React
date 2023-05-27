@@ -11,6 +11,10 @@ const User = new Schema({
         type: String,
         required: true
        //[] unique: true
+    },
+    friends: {
+        type: [String],
+        required: false
     }
 });
 

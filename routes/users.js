@@ -81,4 +81,19 @@ usersRouter.post('/login', (req, res, next) => {
     .catch((err) => next(err));
 });
 
+usersRouter.put('/update', (req, res, next) => {
+    //User.findByIdAndUpdate(req.params.dishId, {
+      User.findOneAndUpdate({ username: req.body.username, password: req.body.password }, {$push: { friends: req.body.friends  }}, {
+        //User.findOneAndUpdate({ username: req.body.username, password: req.body.password }, {friends: [req.body.friends]  }, {
+        new: true,
+        upsert: true // Make this update into an upsert
+      })
+    .then((user) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(user);
+    }, (err) => next(err))
+    .catch((err) => next(err));
+})
+
 module.exports = usersRouter;
