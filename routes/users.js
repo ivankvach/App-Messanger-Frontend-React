@@ -13,7 +13,7 @@ usersRouter.use(bodyParser.json());
 // usersRouter.get('/', authenticate.verifyUser, (req, res, next) => {
 usersRouter.route('/')
   //.get(authenticate.verifyUser, function (req, res, next) {
-    .get(function (req, res, next) {
+  .get(function (req, res, next) {
     User.find(req.query)
       .then((users) => {
         res.statusCode = 200;
@@ -81,18 +81,55 @@ usersRouter.post('/login', (req, res, next) => {
     .catch((err) => next(err));
 });
 
+// usersRouter.put('/update', (req, res, next) => {
+//   //User.findByIdAndUpdate(req.params.dishId, {
+//   User.findOneAndUpdate({ username: req.body.username, password: req.body.password }, { $push: { friends: req.body.friends } }, {
+//     //User.findOneAndUpdate({ username: 'AnnaMakoid', password: 'anna' }, {friends: []  }, {
+//     //User.findOneAndUpdate({ username: req.body.username, password: req.body.password }, {friends: [req.body.friends]  }, {
+//     new: true,
+//     upsert: true // Make this update into an upsert
+//   })
+//     .then((user) => {
+//       res.statusCode = 200;
+//       res.setHeader('Content-Type', 'application/json');
+//       res.json(user);
+//     }, (err) => next(err))
+//     .catch((err) => next(err));
+// })
+
+
 usersRouter.put('/update', (req, res, next) => {
-    //User.findByIdAndUpdate(req.params.dishId, {
-      User.findOneAndUpdate({ username: req.body.username, password: req.body.password }, {$push: { friends: req.body.friends  }}, {
-        //User.findOneAndUpdate({ username: req.body.username, password: req.body.password }, {friends: [req.body.friends]  }, {
-        new: true,
-        upsert: true // Make this update into an upsert
-      })
-    .then((user) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(user);
-    }, (err) => next(err))
+  let findFriend = User.findOne({ 'username': req.body.username });
+  findFriend.then((user) => {
+    let currentFriends = user.friends;
+    let newFriends = 0;
+    currentFriends.map((friend)=>{if(friend == req.body.friends) newFriends++})
+    if(newFriends == 0){
+      user.friends.push(req.body.friends)
+    }
+    if(user.friends == ""){
+      user.friends.push(req.body.friends)
+    }
+    user.save()
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.json(user.friends);
+  }, (err) => next(err))
+    .catch((err) => next(err));
+})
+
+usersRouter.put('/deletefriend', (req, res, next) => {
+  let findFriend = User.findOne({ 'username': req.body.username });
+  findFriend.then((user) => {
+    let currentFriends = user.friends;
+    let newFriends = [];
+    currentFriends.forEach((friend)=>{if(friend != req.body.friends) newFriends.push(friend)})
+      user.friends = newFriends;
+    user.save()
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.json(user.friends);
+  }, (err) => next(err))
     .catch((err) => next(err));
 })
 
