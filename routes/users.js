@@ -133,4 +133,14 @@ usersRouter.put('/deletefriend', (req, res, next) => {
     .catch((err) => next(err));
 })
 
+usersRouter.delete('/deleteuser',(req, res, next) => {
+    User.findOneAndDelete({ 'username': req.body.username })
+    .then((resp) => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(resp);
+    }, (err) => next(err))
+    .catch((err) => next(err));
+})
+
 module.exports = usersRouter;
